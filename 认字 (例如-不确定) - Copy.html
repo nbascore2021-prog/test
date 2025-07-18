@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>词汇测验</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0; font-family: "Noto Sans SC", sans-serif;
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; height: 100vh;
+      transition: background-color 0.3s ease;
+      text-align: center;
+    }
+    .card {
+      font-size: 100px; margin-bottom: 20px;
+    }
+    .image {
+      max-width: 200px;
+      height: auto;
+      margin-bottom: 30px;
+    }
+    button {
+      font-size: 24px; padding: 10px 30px;
+      margin: 10px; border: none; border-radius: 8px;
+      cursor: pointer;
+    }
+    .correct { background-color: #4CAF50; color: white; }
+    .incorrect { background-color: #f44336; color: white; }
+    .restart-btn {
+      font-size: 20px;
+      background: #333; color: #fff;
+      padding: 10px 20px; border-radius: 6px;
+      margin-top: 30px;
+    }
+    .result {
+      font-size: 28px; text-align: center;
+      max-width: 90vw;
+    }
+    .wrong-list {
+      margin-top: 20px;
+      color: red;
+      font-size: 20px;
+    }
+  </style>
+</head>
+<body>
+<div class="card" id="word">开始</div>
+<img class="image" id="wordImage" src="" alt="" style="display:none;" />
+<div>
+  <button class="correct" onclick="markAnswer(true)"> ✅️</button>
+  <button class="incorrect" onclick="markAnswer(false)"> ❌</button>
+</div>
+<div class="result" id="result" style="display:none;"></div>
+<button class="restart-btn" onclick="restart()">重新开始</button>
+
+<script>
+  const originalWords = [
+    '例如', '除了', '与', '关于', '之后', '之间', '那个', '这个', '上面', '下面',
+    '里面', '外面', '华文', '左边', '右边', '中间', '前面', '后面', '旁边', '不用',
+    '一样', '不同', '可以', '不可以', '确定', '不确定', '动物'
+  ];
+
+  const wordImages = {
+    '例如': 'example.png',
+    '除了': 'except.png',
+    '与': 'and.png',
+    '关于': 'about.png',
+    '之后': 'after.png',
+    '之间': 'between.png',
+    '那个': 'that.png',
+    '这个': 'this.png',
+    '上面': 'above.png',
+    '下面': 'below.png',
+    '里面': 'inside.png',
+    '外面': 'outside.png',
+    '华文': 'chinese.png',
+    '左边': 'left.png',
+    '右边': 'right.png',
+    '中间': 'middle.png',
+    '前面': 'front.png',
+    '后面': 'back.png',
+    '旁边': 'beside.png',
+    '不用': 'skip.png',
+    '一样': 'same.png',
+    '不同': 'different.png',
+    '可以': 'can.png',
+    '不可以': 'cannot.png',
+    '确定': 'sure.png',
+    '不确定': 'not_sure.png',
+    '动物': 'animal.png'
+  };
+
+  let words = [];
+  let current = 0;
+  let correct = 0;
+  let wrong = 0;
+  let wrongWords = [];
+
+  const wordDiv = document.getElementById('word');
+  const imageEl = document.getElementById('wordImage');
+  const resultDiv = document.getElementById('result');
+
+  function shuffle(array) {
+    return array.sort(() => Math.random() - 0.5);
+  }
+
+  function showWord() {
+    const word = words[current];
+    wordDiv.innerText = word;
+    document.body.style.backgroundColor = "white";
+    if (wordImages[word]) {
+      imageEl.src = wordImages[word];
+      imageEl.style.display = 'block';
+    } else {
+      imageEl.style.display = 'none';
+    }
+  }
+
+  function markAnswer(isCorrect) {
+    if (isCorrect) {
+      correct++;
+      document.body.style.backgroundColor = "#c8f7c5";
+    } else {
+      wrong++;
+      wrongWords.push(words[current]);
+      document.body.style.backgroundColor = "#f8c6c6";
+    }
+
+    setTimeout(() => {
+      current++;
+      if (current < words.length) {
+        showWord();
+      } else {
+        wordDiv.innerText = "🎊";
+        imageEl.style.display = 'none';
+        resultDiv.style.display = "block";
+        let wrongListHTML = wrongWords.length > 0
+          ? `<div class="wrong-list">❌ 答错的词汇：${wrongWords.join('，')}</div>`
+          : '';
+        resultDiv.innerHTML = `
+          总共 ${words.length} 个词<br>
+          ✅️ ：${correct} 个<br>
+          ❌ ：${wrong} 个
+          ${wrongListHTML}
+        `;
+      }
+    }, 500);
+  }
+
+  function restart() {
+    words = shuffle([...originalWords]);
+    current = 0;
+    correct = 0;
+    wrong = 0;
+    wrongWords = [];
+    resultDiv.style.display = "none";
+    showWord();
+  }
+
+  restart();
+</script>
+</body>
+</html>
